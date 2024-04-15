@@ -6,11 +6,19 @@ Tom mentor dcuk praxí 24
 
 Goal is to create a simple web application that will allow users to create, read, update simple portfolio.
 
-## Requirements
+## TODO
 
-- Tailwind CSS
+- [] Add SQLite database
+- [] Routes for adding, updating and deleting user
+- [] Frontend for adding, updating and deleting user
+- [] Simple authentication
+
+## Technologies
+
 - FastAPI
-- Virtualenv
+- SQLite
+- Tailwind CSS
+- FontAwesome
 
 ## Installation
 
@@ -20,6 +28,8 @@ virtualenv venv
 source ./venv/bin/activate
 pip install -r requirements.txt
 ```
+
+Tip: you can seed users by running `python3 seed_users.py`
 
 ## API
 

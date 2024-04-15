@@ -1,57 +1,35 @@
-from typing import Union, List
-
-from fastapi import FastAPI
+from typing import Union, List, Optional
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, HttpUrl
 from fastapi.middleware.cors import CORSMiddleware
+import json
+import os
 
 origins = ["*"]
 
 
-class Uzivatel(BaseModel):
+class LinkIcon(BaseModel):
+    url: HttpUrl
+    icon: str
+
+
+class User(BaseModel):
     id: int
-    name: str
-    img_url: HttpUrl
-    links: List[HttpUrl]
+    username: str
+    pfp_url: HttpUrl
+    links: Optional[List[LinkIcon]] = None
 
 
 app = FastAPI()
 
 app.add_middleware(CORSMiddleware, allow_origins=origins)
 
-uzivatele = [
-    {
-        "id": 1,
-        "name": "Tom",
-        "img_url": "https://placehold.co/200",
-        "links": ["https://placehold.co/200",
-                  "https://placehold.co/200",
-                  "https://placehold.co/200"]
 
-    },
-    {
-        "id": 2,
-        "name": "Jakub",
-        "img_url": "https://placehold.co/200",
-        "links": ["https://placehold.co/200",
-                  "https://placehold.co/200",
-                  "https://placehold.co/200"]
-
-    },
-    {
-        "id": 3,
-        "name": "Pepa",
-        "img_url": "https://placehold.co/200",
-        "links": ["https://placehold.co/200",
-                  "https://placehold.co/200",
-                  "https://placehold.co/200"]
-
-    }
-]
+uzivatele = json.load(open("users.json"))
 
 
-@ app.get("/")
-def read_root():
-    return {"Hello": "World"}
+if os.path.exists("user_seed.json"):
+    uzivatele = json.load(open("user_seed.json"))
 
 
 @ app.get("/users")
@@ -59,8 +37,9 @@ def moje_funkce():
     return {"users": uzivatele}
 
 
-@ app.get("/users/{id}")
+@ app.get("/users/{id}", response_model=User)
 def find_user(id: int):
     for user in uzivatele:
         if user["id"] == id:
-            return {"user": user}
+            return user
+    raise HTTPException(status_code=404, detail="User not found")

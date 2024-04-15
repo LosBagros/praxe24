@@ -3,30 +3,116 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>UserList</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
   </head>
-  <body>
-    <div class="flex flex-col min-h-screen justify-center items-center">
-      <img src="https://placehold.co/200" alt="PFP" class="rounded-full" />
-      <h1 id="name" class="text-6xl font-bold text-sky-600 mt-4">User</h1>
-      <div class="flex flex-row">
-        <a href="https://fontawesome.com/search" target="_blank">
-          <img src="./github.svg" alt="Link" class="w-12 m-4" />
-        </a>
-      </div>
-    </div>
+  <body class="bg-gradient-to-tr from-gray-900 to-gray-600 bg-fixed">
     <script>
-      let userId = window.location.pathname.substring(1);
-      console.log(userId);
-      let userName = document.getElementById("name");
       async function getUser() {
+        const homeButton = document.createElement("a");
+        homeButton.href = "/";
+        homeButton.className = "absolute left-4 top-4 text-2xl text-white";
+        homeButton.innerHTML = '<i class="fa-solid fa-house"></i>';
+        document.body.appendChild(homeButton);
+
+        const containerElement = document.createElement("div");
+        containerElement.className =
+          "flex flex-col min-h-screen justify-center items-center";
+        document.body.appendChild(containerElement);
+
         const response = await fetch("http://localhost:8000/users/" + userId);
-        const user = await response.json();
-        console.log(user.user.name);
-        userName.innerHTML = user.user.name;
+        if (response.status === 404) {
+          console.log("User not found");
+          window.location.href = "/404.html";
+          return;
+        }
+        const userData = await response.json();
+        document.title = userData.name + " | UserList";
+        const userName = document.createElement("h1");
+        userName.className = "text-4xl font-bold m-4 text-white";
+        userName.innerHTML = userData.username;
+        containerElement.appendChild(userName);
+        const pfp = document.createElement("img");
+        pfp.src = userData.pfp_url;
+        pfp.className = "max-w-64 max-h-64 rounded-full";
+        pfp.alt = `Profile picture of ${userData.username}`;
+        containerElement.appendChild(pfp);
+        const links = document.createElement("div");
+        links.className = "flex flex-row";
+        containerElement.appendChild(links);
+        userData.links.forEach((link) => {
+          const a = document.createElement("a");
+          a.href = link.url;
+          a.target = "_blank";
+          const i = document.createElement("i");
+          i.className = link.icon;
+          i.classList.add("text-4xl", "m-4", "text-white");
+          a.appendChild(i);
+          links.appendChild(a);
+        });
       }
-      getUser();
+
+      async function getAllUsers() {
+        const userGrid = document.createElement("div");
+        userGrid.className = "flex flex-wrap justify-center gap-4 p-4";
+        userGrid.id = "userGrid";
+        document.body.appendChild(userGrid);
+        const response = await fetch("http://localhost:8000/users");
+        const users = await response.json();
+        console.log(users);
+
+        users.users.forEach((user) => {
+          const link = document.createElement("a");
+          link.href = `/${user.id}`;
+
+          const userCard = document.createElement("div");
+          userCard.className =
+            "bg-white shadow rounded px-16 py-4 flex flex-col items-center cursor-pointer hover:bg-gray-100";
+
+          const username = document.createElement("h2");
+          username.textContent = user.username;
+          username.className = "text-2xl font-bold";
+
+          const image = document.createElement("img");
+          image.src = user.pfp_url;
+          image.alt = `Profile picture of ${user.username}`;
+          image.className = "w-32 h-32 rounded-full";
+
+          const links = document.createElement("div");
+          links.className = "mt-2 text-center";
+
+          user.links.forEach((link) => {
+            const a = document.createElement("a");
+            a.href = link.url;
+            a.className = "mx-1";
+            const icon = document.createElement("i");
+            icon.className = `${link.icon} text-3xl`;
+            a.appendChild(icon);
+            links.appendChild(a);
+            a.addEventListener("click", function (event) {
+              event.stopPropagation(); // Prevent redirection from user card click
+            });
+          });
+
+          userCard.appendChild(username);
+          userCard.appendChild(image);
+          userCard.appendChild(links);
+          link.appendChild(userCard);
+          userGrid.appendChild(link);
+        });
+      }
+
+      let userId = window.location.pathname.substring(1);
+      if (userId === "") {
+        console.log("No user ID provided");
+        getAllUsers();
+      } else {
+        getUser();
+      }
     </script>
   </body>
 </html>
