@@ -9,13 +9,25 @@
   <body>
     <div class="flex flex-col min-h-screen justify-center items-center">
       <img src="https://placehold.co/200" alt="PFP" class="rounded-full" />
-      <h1 class="text-6xl font-bold text-sky-600 mt-4">Tom</h1>
+      <h1 id="name" class="text-6xl font-bold text-sky-600 mt-4">User</h1>
       <div class="flex flex-row">
         <a href="https://fontawesome.com/search" target="_blank">
           <img src="./github.svg" alt="Link" class="w-12 m-4" />
         </a>
       </div>
     </div>
+    <script>
+      let userId = window.location.pathname.substring(1);
+      console.log(userId);
+      let userName = document.getElementById("name");
+      async function getUser() {
+        const response = await fetch("http://localhost:8000/users/" + userId);
+        const user = await response.json();
+        console.log(user.user.name);
+        userName.innerHTML = user.user.name;
+      }
+      getUser();
+    </script>
   </body>
 </html>
 

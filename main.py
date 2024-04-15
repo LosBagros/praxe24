@@ -1,8 +1,23 @@
-from typing import Union
+from typing import Union, List
 
 from fastapi import FastAPI
+from pydantic import BaseModel, HttpUrl
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = ["*"]
+
+
+class Uzivatel(BaseModel):
+    id: int
+    name: str
+    img_url: HttpUrl
+    links: List[HttpUrl]
+
 
 app = FastAPI()
+
+app.add_middleware(CORSMiddleware, allow_origins=origins)
+
 uzivatele = [
     {
         "id": 1,
@@ -34,17 +49,17 @@ uzivatele = [
 ]
 
 
-@app.get("/")
+@ app.get("/")
 def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/users")
+@ app.get("/users")
 def moje_funkce():
     return {"users": uzivatele}
 
 
-@app.get("/users/{id}")
+@ app.get("/users/{id}")
 def find_user(id: int):
     for user in uzivatele:
         if user["id"] == id:
