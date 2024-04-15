@@ -1,7 +1,8 @@
+from typing import Union
 
-pole_cisel = [
-    1, 2, 3, 4, 5
-]
+from fastapi import FastAPI
+
+app = FastAPI()
 uzivatele = [
     {
         "id": 1,
@@ -32,4 +33,19 @@ uzivatele = [
     }
 ]
 
-print(uzivatele[0]["links"][0])
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
+@app.get("/users")
+def moje_funkce():
+    return {"users": uzivatele}
+
+
+@app.get("/users/{id}")
+def find_user(id: int):
+    for user in uzivatele:
+        if user["id"] == id:
+            return {"user": user}
