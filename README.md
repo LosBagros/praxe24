@@ -21,8 +21,14 @@ source ./venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Usage
+## API
 
 ```bash
 uvicorn main:app --reload
+```
+
+## Frontend
+
+```bash
+npx vite
 ```
