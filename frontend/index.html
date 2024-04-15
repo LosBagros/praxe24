@@ -12,9 +12,9 @@
   </head>
   <body class="bg-gradient-to-tr from-gray-900 to-gray-600 bg-fixed">
     <script>
-      async function getUser() {
+      async function getUser(userId) {
         const homeButton = document.createElement("a");
-        homeButton.href = "/";
+        homeButton.href = "./";
         homeButton.className = "absolute left-4 top-4 text-2xl text-white";
         homeButton.innerHTML = '<i class="fa-solid fa-house"></i>';
         document.body.appendChild(homeButton);
@@ -25,9 +25,9 @@
         document.body.appendChild(containerElement);
 
         const response = await fetch("http://localhost:8000/users/" + userId);
-        if (response.status === 404) {
+        if (response.status != 200) {
           console.log("User not found");
-          window.location.href = "/404.html";
+          window.location.href = "./404.html";
           return;
         }
         const userData = await response.json();
@@ -67,7 +67,7 @@
 
         users.users.forEach((user) => {
           const link = document.createElement("a");
-          link.href = `/${user.id}`;
+          link.href = `./?user=${user.id}`;
 
           const userCard = document.createElement("div");
           userCard.className =
@@ -88,14 +88,12 @@
           user.links.forEach((link) => {
             const a = document.createElement("a");
             a.href = link.url;
+            a.target = "_blank";
             a.className = "mx-1";
             const icon = document.createElement("i");
             icon.className = `${link.icon} text-3xl`;
             a.appendChild(icon);
             links.appendChild(a);
-            a.addEventListener("click", function (event) {
-              event.stopPropagation(); // Prevent redirection from user card click
-            });
           });
 
           userCard.appendChild(username);
@@ -106,12 +104,13 @@
         });
       }
 
-      let userId = window.location.pathname.substring(1);
-      if (userId === "") {
-        console.log("No user ID provided");
-        getAllUsers();
+      const url = new URL(window.location);
+      const searchParams = new URLSearchParams(url.search);
+      if (searchParams.has("user")) {
+        const userId = searchParams.get("user");
+        getUser(userId);
       } else {
-        getUser();
+        getAllUsers();
       }
     </script>
   </body>

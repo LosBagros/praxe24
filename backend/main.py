@@ -33,7 +33,7 @@ if os.path.exists("user_seed.json"):
 
 
 @ app.get("/users")
-def moje_funkce():
+def get_all_users():
     return {"users": uzivatele}
 
 
